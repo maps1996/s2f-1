@@ -83,7 +83,7 @@ class salome2fish():
                 self.meshs.append(mesh)
                 self.mesh_names.append(mesh.GetName())
         if not self.meshs_exist:
-            print "ERROR: there are no meshs"
+            print ("ERROR: there are no meshs")
 
     def set_work_mesh(self, mesh_name):
         smesh = smeshBuilder.New(salome.myStudy)
@@ -95,12 +95,12 @@ class salome2fish():
             self.work_mesh = smesh.Mesh(obj)
             self.mesh_assigned = True
         if not self.mesh_assigned:
-            print "ERROR: there are no mesh named : " + mesh_name
+            print ("ERROR: there are no mesh named : " + mesh_name)
 
     #
     def list_groups(self):
         if not self.mesh_assigned:
-            print "ERROR: the work mesh has not been seted "
+            print ("ERROR: the work mesh has not been seted ")
         if self.work_mesh.NbVolumes() > 0:
             domain = SMESH.VOLUME
             boundary = SMESH.FACE
@@ -125,25 +125,25 @@ class salome2fish():
 
     def set_domain_group_material(self, mat_idx):
         if(len(mat_idx) != self.domain_group_number):
-            print "ERROR: set region material error!"
+            print ("ERROR: set region material error!")
         self.domain_group_material = mat_idx
         self.material_assigned = True
 
     def set_domain_group_source(self, src_idx):
         if(len(src_idx) != self.domain_group_number):
-            print "ERROR: set region source error!"
+            print ("ERROR: set region source error!")
         self.domain_group_source = src_idx
         self.source_assigned = True
 
     def set_boundary_group_type(self, bc_type):
         if(len(bc_type) != self.boundary_group_number):
-            print "ERROR: set boundary condition error!"
+            print ("ERROR: set boundary condition error!")
         self.boundary_group_type = bc_type
         self.btype_assigned = True
 
     def set_boundary_group_condition(self, bc_idx):
         if(len(bc_idx) != self.boundary_group_number):
-            print "ERROR: set boundary condition error!"
+            print ("ERROR: set boundary condition error!")
         self.boundary_group_condition = bc_idx
         self.bc_assigned = True
 
@@ -152,15 +152,15 @@ class salome2fish():
 
     def export_h5(self):
         if not self.mesh_assigned:
-            print "ERROR: mesh has not been assigned!"
+            print ("ERROR: mesh has not been assigned!")
         if not self.material_assigned:
-            print "ERROR: material has not been assigned!"
+            print ("ERROR: material has not been assigned!")
         if not self.source_assigned:
-            print "ERROR: source has not been assigned!"
+            print ("ERROR: source has not been assigned!")
         if not self.btype_assigned:
-            print "ERROR: boundary type has not been assigned!"
+            print ("ERROR: boundary type has not been assigned!")
         if not self.bc_assigned:
-            print "ERROR: bc has not been assigned!"
+            print ("ERROR: bc has not been assigned!")
 
         if self.work_mesh.NbVolumes() > 0:
             nd = 3
