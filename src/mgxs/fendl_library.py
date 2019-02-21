@@ -90,10 +90,40 @@ class fendl_library(object):
         nn = len(self._nuclide_list)
         return nn
 
+    def neutron_group_structure(self):
+        "neutron energy group structure"
+        any_file = os.listdir(self._fendl_path)[0]
+        f = open('{}/{}'.format(self._fendl_path, any_file), "r")
+        for i in range(0, 8):
+            line = f.readline()
+        lines = ''
+        for i in range(9, 44):
+            line = f.readline()
+            lines = lines + line
+        ngs = map(eval,lines.split()[1:])
+        f.close()
+        return ngs
+
+    def gamma_group_structure(self):
+        "gama energy group structure"
+        any_file = os.listdir(self._fendl_path)[0]
+        f = open('{}/{}'.format(self._fendl_path, any_file), "r")
+        for i in range(0, 44):
+            line = f.readline()
+        lines = ''
+        for i in range(45, 52):
+            line = f.readline()
+            lines = lines + line
+        ggs = map(eval,lines.split()[1:])
+        f.close()
+        return ggs
+
     def print_information(self):
         "print fendl "
         print('nuclide number:',self.nuclide_number())
         print("neutron group number",self.neutron_group())
+        print("neutron group structure",self.neutron_group_structure())
         print("gamma group number",self.gamma_group())
+        print("gamma group structure",self.gamma_group_structure())
         print("group number",self.group_number())
         print('nuclides:',self._nuclide_list)
