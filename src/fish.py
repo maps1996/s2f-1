@@ -33,7 +33,7 @@ data.solver_irst = assign_sp.irst
 mat_idx = np.array(assign_mat.mat_idx, dtype=np.int64)
 src_idx = np.array(assign_mat.src_idx, dtype=np.int64)
 if mat_idx.size != data.domain_group_number:
-    print "ERROR: mat_idx.size != data.domain_group_number"
+    print ("ERROR: mat_idx.size != data.domain_group_number")
 
 data.set_domain_group_material(mat_idx)
 data.set_domain_group_source(src_idx)
@@ -44,7 +44,7 @@ bt_idx = np.array(assign_bc.bt_idx, dtype=np.int64)
 bc_idx = np.array(assign_bc.bc_idx, dtype=np.int64)
 
 if bc_idx.size != data.boundary_group_number:
-    print "ERROR: bc_idx.size != data.boundary_group_number"
+    print ("ERROR: bc_idx.size != data.boundary_group_number")
 
 data.set_boundary_group_type(bt_idx)
 data.set_boundary_group_condition(bc_idx)
@@ -62,5 +62,5 @@ data.close_h5()
 
 # xs
 export_mat()
-print "Done exporting!\n"
-print "Total time: %0.f s\n" % (time.time() - tstart)
+print ("Done exporting!\n")
+print ("Total time: %0.f s\n" % (time.time() - tstart))

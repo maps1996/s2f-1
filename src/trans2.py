@@ -40,8 +40,8 @@ import numpy as np
 import os
 
 matlist = []
-nm = 0
-ng = 0
+nm  = 0
+ng  = 0
 nps = 0
 nup = 0
 ned = 0

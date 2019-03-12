@@ -46,7 +46,7 @@ class assignMesh(QDialog):
         self.work_mesh = self.le1.currentText()
         self.work_mesh = self.work_mesh.encode(
             'unicode-escape').decode('string_escape')
-        print ">>> Assigned mesh: " + self.work_mesh
+        print (">>> Assigned mesh: " + self.work_mesh)
         print(type(self.work_mesh))
         s2f.set_work_mesh(self.work_mesh)
         print(s2f.mesh_assigned)

@@ -1,2 +1,3 @@
 resources/data
 resources/matxsdata
+*.pyc

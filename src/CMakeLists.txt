@@ -22,6 +22,8 @@ SET(_bin_SCRIPTS
   assignSource.py
   fish.py
   trans2.py
+  mgxs/fendl_library.py
+  mesh.py
 )
 
 # --- resources ---

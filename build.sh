@@ -1,6 +1,8 @@
 app_name_=fish_app
-salome_root_dir_=/home/maps/app/SALOME-8.5.0-UB16.04-SRC
-salome_app_root_dir_=/home/maps/app/SALOME-8.5.0-UB16.04-SRC/app
+user_name_=fc
+salome_version_=SALOME-9.2.0-UB18.04-SRC
+salome_root_dir_=/home/$user_name_/app/$salome_version_
+salome_app_root_dir_=/home/$user_name_/app/salome_app
 salome_app_install_dir_=$salome_app_root_dir_/install
 
 source $salome_root_dir_/env_launch.sh
