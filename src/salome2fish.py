@@ -41,9 +41,9 @@ class salome2fish():
         self.btype_assigned = False
 
         # solver parameter
-        self.solver_kmethod = np.string_('RGMRES')
-        self.solver_ptype = np.string_('BJAC')
-        self.solver_afmt = np.string_('CSR')
+        self.solver_kmethod = np.string_('RGMRES ')
+        self.solver_ptype = np.string_('BJAC ')
+        self.solver_afmt = np.string_('CSR ')
         self.solver_itmax = 1000
         self.solver_irst = 100
         self.solver_eps = 1.0e-5
