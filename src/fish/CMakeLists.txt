@@ -2,6 +2,8 @@
 SET(_bin_SCRIPTS
   __init__.py
   mesh.py
+  region.py
+  boundary.py
 )
 
 # --- rules ---

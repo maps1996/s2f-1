@@ -17,8 +17,7 @@ class Mesh(object):
         self.domain = None
         self.boundary = None
         self.init_meshs()
-        if mesh_name is not None:
-            self.set_work_mesh(mesh_name)
+        self.set_work_mesh(mesh_name)
 
     def init_meshs(self):
         "init meshs lists"
@@ -74,7 +73,6 @@ class Mesh(object):
             self.nd = 0
 
         #
-
     def get_dimension(self):
         return self.nd
 
@@ -186,3 +184,4 @@ class Mesh(object):
         h5file[meshName + '/boundary/er'] = er_b
 
         h5file.close()
+        print('Done exporting '+self.mesh_name)
