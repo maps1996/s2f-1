@@ -5,7 +5,7 @@ import h5py
 import numpy as np
 
 
-class mesh(object):
+class Mesh(object):
     """docstring for salome_mesh."""
     def __init__(self, mesh_name):
         self.meshs = list()
@@ -90,7 +90,7 @@ class mesh(object):
             boundary_group_names.append(grp.GetName())
         return boundary_group_names
 
-    def export_h5(self, h5file):
+    def export_h5(self, h5file=None):
         if not self.mesh_assigned:
             print ("ERROR: mesh has not been assigned!")
         if h5file is None:

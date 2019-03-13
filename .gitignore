@@ -1,3 +1,5 @@
 resources/data
 resources/matxsdata
 *.pyc
+build.sh
+salome_fish

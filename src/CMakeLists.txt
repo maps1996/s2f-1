@@ -5,6 +5,9 @@ INCLUDE(UseQtExt)
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
 )
+##
+# Common packages
+##
 
 # --- scripts ---
 
@@ -20,14 +23,19 @@ SET(_bin_SCRIPTS
   assignMat.py
   setSP.py
   assignSource.py
-  fish.py
   trans2.py
   mgxs/fendl_library.py
-  mesh.py
 )
 
 # --- resources ---
-
 # --- rules ---
 
 SALOME_INSTALL_SCRIPTS("${_bin_SCRIPTS}" ${SALOME_INSTALL_SCRIPT_PYTHON})
+
+SET(SUBDIRS
+fish
+)
+
+FOREACH(dir ${SUBDIRS})
+ ADD_SUBDIRECTORY(${dir})
+ENDFOREACH(dir ${SUBDIRS})
