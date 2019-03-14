@@ -23,18 +23,13 @@ class Boundary(object):
         self.type = type
         self.type_assigned = True
         
-    def export_h5(self, h5file=None):
-        if not (self.type_assigned and self.cond_assigned):
-            print ("ERROR: boundary condition has not been assigned!")
-        if h5file is None:
-            h5file = h5py.File('boundary.h5','w')
+    def export_h5(self, h5file):
         pref = 'boundary'
         h5file[pref + '/group_index'] = self.idx 
         h5file[pref + '/group_names'] = self.name
         h5file[pref + '/nb'] = self.num
         h5file[pref + '/cond'] = self.cond
         h5file[pref + '/type'] = self.type
-        h5file.close()
         print('Done exporting boundary information')
         
         

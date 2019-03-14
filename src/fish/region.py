@@ -23,18 +23,13 @@ class Region(object):
         self.s_idx = sidx
         self.source_assigned = True
         
-    def export_h5(self, h5file=None):
-        if not (self.mat_assigned and self.source_assigned):
-            print ("ERROR: region material and source has not been assigned!")
-        if h5file is None:
-            h5file = h5py.File('region.h5','w')
+    def export_h5(self, h5file):
         pref = 'region'
         h5file[pref + '/group_index'] = self.idx 
         h5file[pref + '/group_names'] = self.name
         h5file[pref + '/nr'] = self.num
         h5file[pref + '/m_idx'] = self.m_idx
         h5file[pref + '/s_idx'] = self.s_idx
-        h5file.close()
         print('Done exporting region information')
         
         
