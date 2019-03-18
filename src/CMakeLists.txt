@@ -23,8 +23,6 @@ SET(_bin_SCRIPTS
   assignMat.py
   setSP.py
   assignSource.py
-  trans2.py
-  mgxs/fendl_library.py
 )
 
 # --- resources ---
