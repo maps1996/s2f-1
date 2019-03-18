@@ -6,5 +6,7 @@ class Source(object):
         self.ng = ng
         self.density = np.zeros(ng,ns)
         
+        
     def set_density(self, source, density):
+        
         

@@ -5,6 +5,8 @@ SET(_bin_SCRIPTS
   region.py
   boundary.py
   solver_parameter.py
+  fendl_library.py
+  mgxs.py
 )
 
 # --- rules ---
