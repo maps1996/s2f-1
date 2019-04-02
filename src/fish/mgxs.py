@@ -70,8 +70,8 @@ class MGXS(object):
         h5file['/xs/nl'] = self.nl
         h5file['/xs/nup'] = self.nup
         h5file['/xs/ned'] = self.ned
-        h5file['xs/matnames'] = np.string_(self.matnames)
-        h5file['xs/exsnames'] = np.string_(self.exsnames)
+        h5file['xs/matnames'] = np.string_(self.matnames+" ")
+        h5file['xs/exsnames'] = np.string_(self.exsnames+" ")
         for mat in self.matlist:
             mat.export_h5(h5file)
         h5file.close()

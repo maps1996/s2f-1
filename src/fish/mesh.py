@@ -79,13 +79,13 @@ class Mesh(object):
     def get_domain_group_names(self):
         domain_group_names = []
         for grp in self.work_mesh.GetGroups(self.domain):
-            domain_group_names.append(grp.GetName())
+            domain_group_names.append(grp.GetName()+" ")
         return domain_group_names
 
     def get_boundary_group_names(self):
         boundary_group_names = []
         for grp in self.work_mesh.GetGroups(self.boundary):
-            boundary_group_names.append(grp.GetName())
+            boundary_group_names.append(grp.GetName()+" ")
         return boundary_group_names
 
     def export_h5(self, h5file=None):
