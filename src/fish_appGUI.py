@@ -6,20 +6,8 @@ from qtsalome import *
 # Get SALOME PyQt interface
 sgPyQt = SalomePyQt()
 
-import fish_window_handler as fwh
-
-from defineMaterial import *
-from assignMesh import *
-from assignBC import *
-from assignMat import *
-from setSP import *
-from assignSource import *
-
-from salome2fish import *
-
-# s2f = salome2fish()
-# from assignMesh import s2f as s2f2
-# s2f.mesh_assigned = s2f2.mesh_assigned
+from fish_GUI import *
+import fish_GUI.fish_window_handler as fwh
 
 global main
 if os.getenv("already_initialized", "0") != "1":
@@ -88,20 +76,11 @@ class GUIcontext:
         sgPyQt.createTool(about_id, fish_tid)
 
 
-assign_mat = None
-assign_mh = None
-assign_src = None
-assign_bc = None
-assign_sp = None
-
-
 def assign_mesh():
     global assign_mh
     assign_mh = assignMesh(sgPyQt.getDesktop(), 1)
-    s2f.list_meshs()
-    assign_mh.setMeshNames(s2f.mesh_names)
+    assign_mh.setMeshNames(mh.mesh_names)
     assign_mh.initUI()
-#    s2f.set_work_mesh(d.work_mesh)
     assign_mh.exec_()
 
 
@@ -114,41 +93,30 @@ def define_material():
 
 
 def assign_material():
-    global assign_mat
-    if(not s2f.mesh_assigned):
+    global assign_mh, assign_src
+    if(not mh.mesh_assigned):
         QMessageBox.information(sgPyQt.getDesktop(), "Error",
                                 "The mesh has not been assigned")
     assign_mat = assignMat(sgPyQt.getDesktop(), 1)
-    s2f.list_groups()
-    assign_mat.setRegionNames(s2f.domain_group_names)
+    assign_mat.setRegionNames(assign_mh.domain_names)
     assign_mat.setSource(assign_src.SrcList1)
     assign_mat.initUI()
-    s2f.domain_group_names = []
-    s2f.domain_group_index = []
-    s2f.boundary_group_names = []
-    s2f.boundary_group_index = []
     assign_mat.exec_()
 
 
 def assign_boundary_condition():
-    global assign_bc
-    if(not s2f.mesh_assigned):
+    global assign_mh
+    if(not mh.mesh_assigned):
         QMessageBox.information(sgPyQt.getDesktop(), "Error",
                                 "The mesh has not been assigned")
 
     assign_bc = assignBC(sgPyQt.getDesktop(), 1)
-    s2f.list_groups()
-    assign_bc.setBoundaryNames(s2f.boundary_group_names)
+    assign_bc.setBoundaryNames(assign_mh.boundary_names)
     assign_bc.initUI()
-    s2f.domain_group_names = []
-    s2f.domain_group_index = []
-    s2f.boundary_group_names = []
-    s2f.boundary_group_index = []
     assign_bc.exec_()
 
 
 def set_solver_parameter():
-    global assign_sp
     assign_sp = setSP(sgPyQt.getDesktop(), 1)
     assign_sp.initUI()
     assign_sp.exec_()

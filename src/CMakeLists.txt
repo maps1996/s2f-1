@@ -14,15 +14,6 @@ INCLUDE_DIRECTORIES(
 # scripts / static
 SET(_bin_SCRIPTS
   fish_appGUI.py
-  salome2fish.py
-  fish_window_handler.py
-  make_transx_input.py
-  defineMaterial.py
-  assignMesh.py
-  assignBC.py
-  assignMat.py
-  setSP.py
-  assignSource.py
 )
 
 # --- resources ---
@@ -32,7 +23,9 @@ SALOME_INSTALL_SCRIPTS("${_bin_SCRIPTS}" ${SALOME_INSTALL_SCRIPT_PYTHON})
 
 SET(SUBDIRS
 fish
+fish_GUI
 )
+
 
 FOREACH(dir ${SUBDIRS})
  ADD_SUBDIRECTORY(${dir})

@@ -67,7 +67,7 @@ class salome2fish():
 
     ##
     def list_meshs(self):
-        smesh = smeshBuilder.New(salome.myStudy)
+        smesh = smeshBuilder.New()
         self.mesh_names = []
         self.meshs_exist = False
         smeshComp = salome.myStudy.FindComponent("SMESH")
@@ -86,10 +86,9 @@ class salome2fish():
             print ("ERROR: there are no meshs")
 
     def set_work_mesh(self, mesh_name):
-        smesh = smeshBuilder.New(salome.myStudy)
+        smesh = smeshBuilder.New()
         mesh_path = "/Mesh/" + mesh_name
         obj = salome.myStudy.FindObjectByPath(mesh_path).GetObject()
-        print(type(obj))
         self.mesh_assigned = False
         if obj:
             self.work_mesh = smesh.Mesh(obj)
@@ -258,16 +257,22 @@ class salome2fish():
 
         #===========================================
         # region
+        dgn_encode = list()
+        for dg_names in self.domain_group_names:
+            dgn_encode.append(dg_names.encode())
         self.h5file['/region/group_index'] = self.domain_group_index
-        self.h5file['/region/group_names'] = self.domain_group_names
+        self.h5file['/region/group_names'] = dgn_encode
         self.h5file['/region/nr'] = self.domain_group_number
         self.h5file['/region/m_idx'] = self.domain_group_material
         self.h5file['/region/s_idx'] = self.domain_group_source
 
         #===========================================
         # boundary condition
+        bgn_encode = list()
+        for bg_names in self.boundary_group_names:
+            bgn_encode.append(bg_names.encode())
         self.h5file['/bc/group_index'] = self.boundary_group_index
-        self.h5file['/bc/group_names'] = self.boundary_group_names
+        self.h5file['/bc/group_names'] = bgn_encode
         self.h5file['/bc/nb'] = self.boundary_group_number
         self.h5file['/bc/type'] = self.boundary_group_type
         self.h5file['/bc/cond'] = self.boundary_group_condition

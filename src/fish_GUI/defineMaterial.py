@@ -5,8 +5,9 @@ import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from fish_GUI.combobox import *
 
-import make_transx_input as make_input
+import fish_GUI.make_transx_input as make_input
 
 
 _nuclide_list = ['al27 ', 'c12  ', 'cr52 ', 'fe54 ', 'h2   ', 'li7  ', 'mo95 ', 'na23 ',
@@ -34,32 +35,41 @@ class defineMaterial(QDialog):
         btn = QPushButton('Apply')
         pts = QLabel('Particle')
 
-        close_btn = QPushButton('Close')
         apply_btn = QPushButton('Apply')
         new_btn = QPushButton('New')
         del_btn = QPushButton('Delete')
         applymat_btn = QPushButton('Apply')
+        applyexs_btn = QPushButton('Apply')
         delmat_btn = QPushButton('Delete')
+        delexs_btn = QPushButton('Delete')
         path_btn = QPushButton('data path')
 
         lb1 = QLabel('Nuclide')
         lb2 = QLabel('Density')
         lb3 = QLabel('Material Name')
+        lb4 = QLabel('Legendre order')
+        lb5 = QLabel('Extra xs')
 
         btn.clicked.connect(self.apply)
         applymat_btn.clicked.connect(self.apply1)
+        applyexs_btn.clicked.connect(self.apply2)
         apply_btn.clicked.connect(self.make)
 
         del_btn.clicked.connect(self.delete)
         delmat_btn.clicked.connect(self.delete1)
+        delexs_btn.clicked.connect(self.delete2)
         path_btn.clicked.connect(self.setpath)
 
         self.MatList = []
         self.NumMat = 0
         self.MatList1 = []
 
+        self.Exslist = []
+        self.Numexs = 0
+
         self.MatListWidget = QListWidget()
         self.NucListWidget = QListWidget()
+        self.ExsListWidget = QListWidget()
 
         self.MatListWidget.itemClicked.connect(self.showMatComponent)
 
@@ -72,6 +82,8 @@ class defineMaterial(QDialog):
         self.le2.setValidator(QDoubleValidator())
 
         self.le3 = QLineEdit()
+        self.le4 = QLineEdit()
+        self.le5 = QLineEdit()
         self.le0 = QComboBox()
         self.le0.addItem("neutron")
         self.le0.addItem("gamma")
@@ -81,8 +93,9 @@ class defineMaterial(QDialog):
         layout.addWidget(self.le0, 0, 2, 1, 2)
         layout.addWidget(path_btn, 0, 4, 1, 1)
 
-        layout.addWidget(self.MatListWidget, 0, 0, 5, 1)
+        layout.addWidget(self.MatListWidget, 0, 0, 3, 1)
         layout.addWidget(self.NucListWidget, 2, 1, 1, 6)
+        layout.addWidget(self.ExsListWidget, 3, 0, 3, 1)
 
         layout.addWidget(lb1, 3, 1)
         layout.addWidget(self.le1, 3, 2)
@@ -96,9 +109,16 @@ class defineMaterial(QDialog):
         layout.addWidget(applymat_btn, 1, 5)
         layout.addWidget(delmat_btn, 1, 6)
 
-        layout.addWidget(new_btn, 4, 1, 1, 1)
-        layout.addWidget(apply_btn, 4, 5, 1, 1)
-        layout.addWidget(close_btn, 4, 6, 1, 1)
+        layout.addWidget(lb4, 0, 5)
+        layout.addWidget(self.le4, 0, 6)
+
+        layout.addWidget(lb5, 4, 1)
+        layout.addWidget(self.le5, 4, 2, 1, 3)
+        layout.addWidget(applyexs_btn, 4, 5)
+        layout.addWidget(delexs_btn, 4, 6)
+
+        layout.addWidget(new_btn, 5, 1, 1, 1)
+        layout.addWidget(apply_btn, 5, 5, 1, 1)
 
         self.setWindowTitle('Material')
         self.show()
@@ -121,7 +141,7 @@ class defineMaterial(QDialog):
         t = 0
         if self.NucListWidget.count() == 0:
             self.MatList[row].addNuclide(
-                str(self.le1.currentText()), float(self.le2.text()))
+                str(self.le1.currentText()), str(self.le2.text()))
             self.NucListWidget.clear()
             for i in range(self.MatList[row].NumNuclide):
                 _item = QListWidgetItem(
@@ -135,7 +155,7 @@ class defineMaterial(QDialog):
                     self, "error", "The nuclides component already exist.", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
             else:
                 self.MatList[row].addNuclide(
-                    str(self.le1.currentText()), float(self.le2.text()))
+                    str(self.le1.currentText()), str(self.le2.text()))
                 self.NucListWidget.clear()
                 for i in range(self.MatList[row].NumNuclide):
                     _item = QListWidgetItem(
@@ -162,6 +182,25 @@ class defineMaterial(QDialog):
                 self.NumMat = self.NumMat + 1
                 _item = QListWidgetItem(NewMat.Name, self.MatListWidget)
 
+    def apply2(self):
+        Newexs = str(self.le5.text())
+        t = 0
+        if self.ExsListWidget.count() == 0:
+            self.Exslist.append(Newexs)
+            self.Numexs = self.Numexs + 1
+            _item = QListWidgetItem(Newexs, self.ExsListWidget)
+        else:
+            for exs in self.Exslist:
+                if Newexs == exs:
+                    t = 1
+            if t == 1:
+                reply = QMessageBox.critical(
+                    self, "error", "The extra cross section has been created", QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+            else:
+                self.Exslist.append(Newexs)
+                self.Numexs = self.Numexs + 1
+                _item = QListWidgetItem(Newexs, self.ExsListWidget)
+
     def delete(self):
         row = self.MatListWidget.currentRow()
         row1 = self.NucListWidget.currentRow()
@@ -177,6 +216,12 @@ class defineMaterial(QDialog):
         self.NumMat -= 1
         self.MatListWidget.takeItem(self.MatListWidget.currentRow())
         self.NucListWidget.clear()
+
+    def delete2(self):
+        row = self.ExsListWidget.currentRow()
+        del self.Exslist[row]
+        self.Numexs -= 1
+        self.ExsListWidget.takeItem(self.ExsListWidget.currentRow())
     # use make_transx_input
 
     def make(self):
@@ -191,6 +236,7 @@ class defineMaterial(QDialog):
             gg = True
         NREG = self.MatListWidget.count()
         NMIX = self.MatListWidget.count()
+        NL = int(self.le4.text())
         NMIXS = 0
         c1 = make_input.card1()
         c2 = make_input.card2(ng, gg)
@@ -207,43 +253,19 @@ class defineMaterial(QDialog):
                 list2.append(
                     str(self.MatList[i].Nuclide[j]) + '   ' + str(self.MatList[i].Density[j]))
                 NMIXS = NMIXS + 1
-                c7 += "     {}    {}    {}/\n".format(i + 1, i + 1,
-                                                      str(self.MatList[i].Nuclide[j]) + '   ' + str(self.MatList[i].Density[j]))
-        c3 = make_input.card3(self.datapath, ng, gg, NMIX, NMIXS)
+                c7 += " {}    {}    {}/\n".format(i + 1, i + 1,
+                                                  str(self.MatList[i].Nuclide[j]) + '   ' + str(self.MatList[i].Density[j]))
+        c3 = make_input.card3(self.datapath, ng, gg,
+                              NMIX, NMIXS, NL, self.Numexs)
+        c8 = make_input.card8(self.Exslist)
+        c9 = make_input.card9(self.Exslist)
 
-        total = c1 + c2 + c3 + c4 + c5 + c7 + 'stop'
-        input_file = open("transx.inp", "w")
+        total = c1 + c2 + c3 + c4 + c5 + c7 + c8 + c9 + 'stop'
+        input_file = open('transx.inp', 'w+')
         input_file.write(total)
         input_file.close()
-        os.system(". ~/.profile")
-        os.system("transx")
-
-
-class comboValidator(QValidator):
-    """Validator for editable combobox input field"""
-
-    def __init__(self, combobox):
-        super(QValidator, self).__init__(combobox)
-
-    def validate(self, text, pos):
-        """
-        Validate the inputted text. Allow to enter the any item text only.
-
-        Arguments:
-        text (str): Validated text
-        pos (int): Current position in editor
-
-        Returns:
-        (QValidator.State): Validation result state
-        """
-        state = QValidator.Invalid
-        if len(text) == 0:
-            state = QValidator.Intermediate
-        else:
-            idx = self.parent().findText(text, Qt.MatchStartsWith)
-            if idx >= 0 and self.parent().itemText(idx).startswith(text):
-                state = QValidator.Acceptable
-        return state, text, pos
+        print(input_file.closed)
+        os.system('transx')
 
 
 class Mat():

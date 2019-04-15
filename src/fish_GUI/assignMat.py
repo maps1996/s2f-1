@@ -5,7 +5,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import numpy as np
-from trans2 import *
+from fish.mgxs import *
+from fish.region import *
+from fish_GUI.assignMesh import *
+from fish_GUI.combobox import *
 
 
 class assignMat(QDialog):
@@ -14,13 +17,12 @@ class assignMat(QDialog):
         self.setObjectName('AssignMaterial')
         self.setModal(modal)
         self.setWindowTitle('AssignMaterial')
-        if len(matlist) == 0:
-            init_matlist('./transx.out')
+        mgxs = MGXS('./transx.out')
         self.Material = []
-        for mat in matlist:
-            self.Material.append(mat.name)
+        for mat in mgxs.matnames:
+            self.Material.append(mat)
         self.Material.append('vacuum')
-        self.source = []
+        self.source = ['none']
         self.names = []
 
     def get_material_ID(self, mat):
@@ -36,6 +38,10 @@ class assignMat(QDialog):
             return 5
         if (mat == 'm6'):
             return 6
+        if (mat == 'm7'):
+            return 7
+        if (mat == 'm8'):
+            return 8
         if (mat == 'vacuum'):
             return 0
 
@@ -59,7 +65,6 @@ class assignMat(QDialog):
         self.nsrc = len(srclist)
         for src in srclist:
             self.source.append(src)
-        self.source.append('none')
 
     def initUI(self):
         grid = QGridLayout()
@@ -80,6 +85,7 @@ class assignMat(QDialog):
         le_names1 = locals()
         self.list1 = []
         self.list2 = []
+        settings = QSettings("config.ini", QSettings.IniFormat)
         for i in range(self.nR):
             lb = QLabel(self.names[i])
             grid.addWidget(lb, i + 1, 0)
@@ -92,6 +98,12 @@ class assignMat(QDialog):
             self.list1[i].addItems(self.Material)
             self.list1[i].setValidator(comboValidator(self.list1[i]))
             self.list1[i].setCompleter(QCompleter(self.Material))
+            if settings.value('mat' + str(i)):
+                self.list1[i].setCurrentIndex(
+                    int(settings.value('mat' + str(i))))
+            else:
+                self.list1[i].setCurrentIndex(0)
+
             grid.addWidget(self.list1[i], i + 1, 1)
 
             le_names1['n' + str(self.nR + i + 1)] = 'self.le' + \
@@ -102,6 +114,11 @@ class assignMat(QDialog):
             self.list2[i].addItems(self.source)
             self.list2[i].setValidator(comboValidator(self.list2[i]))
             self.list2[i].setCompleter(QCompleter(self.source))
+            if settings.value('mat' + str(i + self.nR)):
+                self.list2[i].setCurrentIndex(
+                    int(settings.value('mat' + str(i + self.nR))))
+            else:
+                self.list2[i].setCurrentIndex(0)
             grid.addWidget(self.list2[i], i + 1, 2)
 
         self.show()
@@ -110,33 +127,24 @@ class assignMat(QDialog):
         for i in range(self.nR):
             self.mat_idx[i] = self.get_material_ID(self.list1[i].currentText())
             self.src_idx[i] = self.get_source_ID(self.list2[i].currentText())
-
+        region = Region(mh)
+        region.set_midx(self.mat_idx)
+        region.set_sidx(self.src_idx)
+        mgxs = MGXS('./transx.out')
+        h5file = h5py.File('fish.h5', 'r+')
+        pref = 'xs'
+        if pref in h5file.keys():
+            h5file.__delitem__(pref)
+        region.export_h5(h5file)
+        mgxs.export_h5(h5file)
+        h5file.close()
+        self.save()
         print(self.mat_idx)
         print(self.src_idx)
 
-
-class comboValidator(QValidator):
-    """Validator for editable combobox input field"""
-
-    def __init__(self, combobox):
-        super(QValidator, self).__init__(combobox)
-
-    def validate(self, text, pos):
-        """
-        Validate the inputted text. Allow to enter the any item text only.
-
-        Arguments:
-        text (str): Validated text
-        pos (int): Current position in editor
-
-        Returns:
-        (QValidator.State): Validation result state
-        """
-        state = QValidator.Invalid
-        if len(text) == 0:
-            state = QValidator.Intermediate
-        else:
-            idx = self.parent().findText(text, Qt.MatchStartsWith)
-            if idx >= 0 and self.parent().itemText(idx).startswith(text):
-                state = QValidator.Acceptable
-        return state, text, pos
+    def save(self):
+        settings = QSettings("config.ini", QSettings.IniFormat)
+        for i in range(self.nR):
+            settings.setValue('mat' + str(i), self.list1[i].currentIndex())
+            settings.setValue('mat' + str(i + self.nR),
+                              self.list2[i].currentIndex())

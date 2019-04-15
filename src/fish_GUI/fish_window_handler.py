@@ -24,21 +24,5 @@ class FishWindowHandler():
         msg1 = "by Fang chao, Miao Jianxin 2018."
         QMessageBox.about(None, title, msg + msg1)
 
-    def assignMesh(self):
-        w = QWidget()
-        vbox = QHBoxLayout()
-        lb = QLabel('Enter you name')
-        self.le = QLineEdit()
-        bt = QPushButton('Hello')
-        bt.clicked.connect(self.hello)
-
-        vbox.addWidget(lb)
-        vbox.addWidget(le)
-        vbox.addWidget(bt)
-        w.setLayout(vbox)
-        w.setWindowTitle('Hello')
-        w.resize(400, 300)
-        w.show()
-
     def hello(self):
         QMessageBox.information(self, 'Information', 'Hello ', self.le.text())

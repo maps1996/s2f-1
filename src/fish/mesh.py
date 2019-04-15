@@ -7,7 +7,8 @@ import numpy as np
 
 class Mesh(object):
     """docstring for salome_mesh."""
-    def __init__(self, mesh_name):
+
+    def __init__(self, mesh_name=None):
         self.meshs = list()
         self.mesh_names = []
         self.meshs_exist = False
@@ -17,7 +18,8 @@ class Mesh(object):
         self.domain = None
         self.boundary = None
         self.init_meshs()
-        self.set_work_mesh(mesh_name)
+        if mesh_name is not None:
+            self.set_work_mesh(mesh_name)
 
     def init_meshs(self):
         "init meshs lists"
@@ -79,44 +81,44 @@ class Mesh(object):
     def get_domain_group_names(self):
         domain_group_names = []
         for grp in self.work_mesh.GetGroups(self.domain):
-            domain_group_names.append(grp.GetName()+" ")
+            domain_group_names.append(grp.GetName() + " ")
         return domain_group_names
 
     def get_boundary_group_names(self):
         boundary_group_names = []
         for grp in self.work_mesh.GetGroups(self.boundary):
-            boundary_group_names.append(grp.GetName()+" ")
+            boundary_group_names.append(grp.GetName() + " ")
         return boundary_group_names
 
     def export_h5(self, h5file=None):
         if not self.mesh_assigned:
             print ("ERROR: mesh has not been assigned!")
         if h5file is None:
-            h5file = h5py.File(self.mesh_name+'.h5','w')
+            h5file = h5py.File(self.mesh_name + '.h5', 'w')
 
-        if self.nd ==  3:
+        if self.nd == 3:
             ne = self.work_mesh.NbVolumes()
             ne_b = self.work_mesh.NbFaces()
             ne_e = self.work_mesh.NbEdges()
             ne_t = ne_b + ne_e
-            enn   = 4
+            enn = 4
             enn_b = 3
         elif self.nd == 2:
             ne = self.work_mesh.NbFaces()
             ne_b = self.work_mesh.NbEdges()
             ne_e = 0
             ne_t = ne_b
-            enn   = 3
+            enn = 3
             enn_b = 2
         elif self.nd == 1:
             ne = self.work_mesh.NbEdges()
             ne_b = 2
             ne_e = 0
             ne_t = ne_b
-            enn   = 2
+            enn = 2
             enn_b = 1
         # mesh.nodes
-        nn  = self.work_mesh.NbNodes()
+        nn = self.work_mesh.NbNodes()
         coo = np.zeros((nn, 3), dtype=np.float)
         nid = self.work_mesh.GetElementsByType(SMESH.NODE)
         n = 0
@@ -125,6 +127,8 @@ class Mesh(object):
             n = n + 1
         # meshName = self.work_mesh.GetName()
         meshName = 'mesh'
+        if meshName in h5file.keys():
+            h5file.__delitem__(meshName)
         h5file[meshName + '/nodes/nd'] = self.nd
         h5file[meshName + '/nodes/nn'] = nn
         h5file[meshName + '/nodes/id'] = nid
@@ -184,4 +188,4 @@ class Mesh(object):
         h5file[meshName + '/boundary/er'] = er_b
 
         h5file.close()
-        print('Done exporting '+self.mesh_name)
+        print('Done exporting ' + self.mesh_name)

@@ -1,12 +1,14 @@
 import h5py
 import numpy as np
 
+
 class Region(object):
     """assign material and source to region."""
+
     def __init__(self, mesh):
         self.name = mesh.get_domain_group_names()
-        self.num  = len(self.name)
-        self.idx  = list(range(1,self.num+1))
+        self.num = len(self.name)
+        self.idx = list(range(1, self.num + 1))
         self.mat_assigned = False
         self.source_assigned = False
         self.m_idx = None
@@ -26,6 +28,8 @@ class Region(object):
 
     def export_h5(self, h5file):
         pref = 'region'
+        if pref in h5file.keys():
+            h5file.__delitem__(pref)
         h5file[pref + '/group_index'] = self.idx
         h5file[pref + '/group_names'] = np.string_(self.name)
         h5file[pref + '/nr'] = self.num

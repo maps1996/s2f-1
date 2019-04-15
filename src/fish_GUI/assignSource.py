@@ -4,6 +4,7 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from fish.source import *
 
 
 class assignSrc(QDialog):
@@ -32,6 +33,7 @@ class assignSrc(QDialog):
         self.bt1 = QPushButton('Apply')
         self.bt2 = QPushButton('Apply')
         self.bt3 = QPushButton('Delete')
+        self.bt4 = QPushButton('Export')
 
         grid.addWidget(self.lb1, 0, 0)
         grid.addWidget(self.le1, 1, 0, 5, 2)
@@ -40,12 +42,14 @@ class assignSrc(QDialog):
         grid.addWidget(self.le2, 2, 3)
         grid.addWidget(self.bt2, 2, 4)
         grid.addWidget(self.bt3, 3, 4)
+        grid.addWidget(self.bt4, 5, 4)
         grid.addWidget(self.lb3, 0, 3)
         grid.addWidget(self.SrcListWidget, 1, 3, 1, 1)
 
         self.bt1.clicked.connect(self.apply)
         self.bt2.clicked.connect(self.apply1)
         self.bt3.clicked.connect(self.delete)
+        self.bt4.clicked.connect(self.export)
         self.SrcListWidget.itemClicked.connect(self.showSrcComponent)
 
         self.show()
@@ -76,6 +80,18 @@ class assignSrc(QDialog):
             self.list2.append(float(f))
         self.SrcList[row].addSource(self.list2)
         self.list2 = []
+
+    def export(self):
+        h5file = h5py.File('fish.h5', 'r+')
+        pref='source'
+        if pref in h5file.keys():
+            h5file.__delitem__(pref)
+        h5file['/source/ns'] = self.NumSrc
+        for i in range(self.NumSrc):
+            h5_src = Source_h5(
+                self.SrcList1[i], self.SrcList[i].list)
+            h5_src.export_h5(h5file)
+        h5file.close()
 
     def apply1(self):
         self.le1.clear()

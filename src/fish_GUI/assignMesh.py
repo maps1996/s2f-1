@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 #-*- coding: utf-8 -*-
 import sys
+import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from salome2fish import *
-
-s2f = salome2fish()
+from fish.mesh import *
+from fish_GUI.combobox import *
+mh = Mesh()
 
 
 class assignMesh(QDialog):
@@ -17,6 +18,8 @@ class assignMesh(QDialog):
         self.setWindowTitle('Mesh')
         self.mesh_names = ''
         self.work_mesh = ''
+        self.domain_names = []
+        self.boundary_names = []
 
     def setMeshNames(self, names):
         self.mesh_names = names
@@ -45,35 +48,17 @@ class assignMesh(QDialog):
     def apply(self):
         self.work_mesh = self.le1.currentText()
         self.work_mesh = self.work_mesh.encode(
-            'unicode-escape').decode('string_escape')
+            'utf8').decode('utf8')
         print (">>> Assigned mesh: " + self.work_mesh)
-        print(type(self.work_mesh))
-        s2f.set_work_mesh(self.work_mesh)
-        print(s2f.mesh_assigned)
-
-
-class comboValidator(QValidator):
-    """Validator for editable combobox input field"""
-
-    def __init__(self, combobox):
-        super(QValidator, self).__init__(combobox)
-
-    def validate(self, text, pos):
-        """
-        Validate the inputted text. Allow to enter the any item text only.
-
-        Arguments:
-        text (str): Validated text
-        pos (int): Current position in editor
-
-        Returns:
-        (QValidator.State): Validation result state
-        """
-        state = QValidator.Invalid
-        if len(text) == 0:
-            state = QValidator.Intermediate
+        mh.set_work_mesh(self.work_mesh)
+        nd = mh.get_dimension()
+        self.domain_names = mh.get_domain_group_names()
+        self.boundary_names = mh.get_boundary_group_names()
+        if os.path.exists('./fish.h5'):
+            h5file = h5py.File('fish.h5', 'r+')
+            mh.export_h5(h5file)
+            h5file.close()
         else:
-            idx = self.parent().findText(text, Qt.MatchStartsWith)
-            if idx >= 0 and self.parent().itemText(idx).startswith(text):
-                state = QValidator.Acceptable
-        return state, text, pos
+            h5file = h5py.File('fish.h5', 'w')
+            mh.export_h5(h5file)
+            h5file.close()

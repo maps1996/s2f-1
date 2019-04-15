@@ -4,6 +4,8 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
+from fish.solver_parameter import *
+from fish.spherical_harmonics import *
 
 
 class setSP(QDialog):
@@ -48,6 +50,14 @@ class setSP(QDialog):
         self.sph_pn = int(self.le1.text())
         self.eps = float(self.le2.text())
         self.irst = int(self.le3.text())
+        sp = SolverParameter()
+        sph = SphericalHarmonics(self.sph_pn)
+        sp.eps = self.eps
+        sp.irst = self.irst
+        h5file = h5py.File('fish.h5', 'r+')
+        sp.export_h5(h5file)
+        sph.export_h5(h5file)
+        h5file.close()
         print(self.sph_pn)
         print(self.eps)
         print(self.irst)
