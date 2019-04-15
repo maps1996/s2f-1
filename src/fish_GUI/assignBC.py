@@ -5,6 +5,9 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import numpy as np
+from fish.boundary import *
+from fish_GUI.assignMesh import *
+from fish_GUI.combobox import *
 
 
 class assignBC(QDialog):
@@ -16,7 +19,7 @@ class assignBC(QDialog):
         self.type = ['x+', 'x-', 'y+', 'y-', 'z+',
                      'z-', 'Inclined plane', 'curved surface']
         self.type_ID = [1, -1, 2, -2, 3, -3, 4, 5]
-        self.cond = ['vacuum', 'reflect']
+        self.cond = ['reflect', 'vacuum']
         self.cond_ID = [0, 1]
         self.names = []
 
@@ -82,6 +85,7 @@ class assignBC(QDialog):
         le_names1 = locals()
         self.list2 = []
         self.list3 = []
+        settings = QSettings("config.ini", QSettings.IniFormat)
         for i in range(self.nb):
             lb = QLabel(self.names[i])
             grid.addWidget(lb, i + 1, 0)
@@ -93,6 +97,11 @@ class assignBC(QDialog):
             self.list2[i].addItems(self.type)
             self.list2[i].setValidator(comboValidator(self.list2[i]))
             self.list2[i].setCompleter(QCompleter(self.type))
+            if settings.value('bc' + str(i)):
+                self.list2[i].setCurrentIndex(
+                    int(settings.value('bc' + str(i))))
+            else:
+                self.list2[i].setCurrentIndex(0)
             grid.addWidget(self.list2[i], i + 1, 1)
 
             le_names1['n' + str(self.nb + i + 2)] = 'self.le' + \
@@ -103,6 +112,11 @@ class assignBC(QDialog):
             self.list3[i].addItems(self.cond)
             self.list3[i].setValidator(comboValidator(self.list3[i]))
             self.list3[i].setCompleter(QCompleter(self.cond))
+            if settings.value('bc' + str(i + self.nb)):
+                self.list3[i].setCurrentIndex(
+                    int(settings.value('bc' + str(i + self.nb))))
+            else:
+                self.list3[i].setCurrentIndex(0)
             grid.addWidget(self.list3[i], i + 1, 3)
 
         self.show()
@@ -111,32 +125,19 @@ class assignBC(QDialog):
         for i in range(self.nb):
             self.bt_idx[i] = self.get_type_ID(self.list2[i].currentText())
             self.bc_idx[i] = self.get_cond_ID(self.list3[i].currentText())
+        boundary = Boundary(mh)
+        boundary.set_cond(self.bc_idx)
+        boundary.set_type(self.bt_idx)
+        h5file = h5py.File('fish.h5', 'r+')
+        boundary.export_h5(h5file)
+        h5file.close()
+        self.save()
         print(self.bt_idx)
         print(self.bc_idx)
 
-
-class comboValidator(QValidator):
-    """Validator for editable combobox input field"""
-
-    def __init__(self, combobox):
-        super(QValidator, self).__init__(combobox)
-
-    def validate(self, text, pos):
-        """
-        Validate the inputted text. Allow to enter the any item text only.
-
-        Arguments:
-        text (str): Validated text
-        pos (int): Current position in editor
-
-        Returns:
-        (QValidator.State): Validation result state
-        """
-        state = QValidator.Invalid
-        if len(text) == 0:
-            state = QValidator.Intermediate
-        else:
-            idx = self.parent().findText(text, Qt.MatchStartsWith)
-            if idx >= 0 and self.parent().itemText(idx).startswith(text):
-                state = QValidator.Acceptable
-        return state, text, pos
+    def save(self):
+        settings = QSettings("config.ini", QSettings.IniFormat)
+        for i in range(self.nb):
+            settings.setValue('bc' + str(i), self.list2[i].currentIndex())
+            settings.setValue('bc' + str(i + self.nb),
+                              self.list3[i].currentIndex())

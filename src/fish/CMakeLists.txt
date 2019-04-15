@@ -7,6 +7,8 @@ SET(_bin_SCRIPTS
   solver_parameter.py
   fendl_library.py
   mgxs.py
+  source.py
+  spherical_harmonics.py
 )
 
 # --- rules ---

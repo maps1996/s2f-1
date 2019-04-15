@@ -1,12 +1,14 @@
 import h5py
 import numpy as np
 
+
 class Boundary(object):
     """assign material and source to region."""
+
     def __init__(self, mesh):
         self.name = mesh.get_boundary_group_names()
-        self.num  = len(self.name)
-        self.idx  = list(range(1,self.num+1))
+        self.num = len(self.name)
+        self.idx = list(range(1, self.num + 1))
         self.cond_assigned = False
         self.type_assigned = False
         self.cond = None
@@ -25,7 +27,9 @@ class Boundary(object):
         self.type_assigned = True
 
     def export_h5(self, h5file):
-        pref = 'boundary'
+        pref = 'bc'
+        if pref in h5file.keys():
+            h5file.__delitem__(pref)
         h5file[pref + '/group_index'] = self.idx
         h5file[pref + '/group_names'] = np.string_(self.name)
         h5file[pref + '/nb'] = self.num

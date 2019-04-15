@@ -1,17 +1,21 @@
 import numpy as np
 import h5py
 
+
 class MGXS(object):
     """docstring for mgxs."""
+
     def __init__(self, transx_file):
         self.nm = 0
         self.ng = 0
         self.nl = 0
-        self.nup= 0
-        self.ned= 0
-        self.matlist  = list()
+        self.nup = 0
+        self.ned = 0
+        self.matlist = list()
         self.matnames = list()
         self.exsnames = list()
+        self.matnames1 = list()
+        self.exsnames1 = list()
         self.read_transx(transx_file)
 
     def read_transx(self, filename):
@@ -58,20 +62,25 @@ class MGXS(object):
         inp.close()
 
         for i in range(self.nm):
-            imat = Material(self.matnames[i], self.ng, self.nl, self.nup, self.exsnames)
+            imat = Material(self.matnames[i], self.ng,
+                            self.nl, self.nup, self.exsnames)
             imat.read_transx_xs(filename)
             self.matlist.append(imat)
 
     def export_h5(self, h5file=None):
         if h5file is None:
-            h5file = h5py.File('xs.h5','w')
+            h5file = h5py.File('xs.h5', 'w')
+        for matstr in self.matnames:
+            self.matnames1.append(matstr.encode('utf8').decode('utf8') + ' ')
+        for exsstr in self.exsnames:
+            self.exsnames1.append(exsstr.encode('utf8').decode('utf8') + ' ')
         h5file['/xs/nm'] = self.nm
         h5file['/xs/ng'] = self.ng
         h5file['/xs/nl'] = self.nl
-        h5file['/xs/nup'] = self.nup
-        h5file['/xs/ned'] = self.ned
-        h5file['xs/matnames'] = np.string_(self.matnames+" ")
-        h5file['xs/exsnames'] = np.string_(self.exsnames+" ")
+        h5file['/xs/nu'] = self.nup
+        h5file['/xs/ne'] = self.ned
+        h5file['xs/matnames'] = np.string_(self.matnames1)
+        h5file['xs/exsnames'] = np.string_(self.exsnames1)
         for mat in self.matlist:
             mat.export_h5(h5file)
         h5file.close()
@@ -79,28 +88,29 @@ class MGXS(object):
 
 class Material(object):
     """docstring for material."""
-    def __init__(self, name, ng, nl,nup, exsnames):
+
+    def __init__(self, name, ng, nl, nup, exsnames):
         self.name = name
         self.ng = ng
         self.nl = nl
-        self.nup= nup
+        self.nup = nup
         self.exsnames = exsnames
-        self.ned= len(exsnames)
+        self.ned = len(exsnames)
 
         self.xs_t = [0.0] * ng
         self.xs_a = [0.0] * ng
         self.xs_s = [0.0] * ng
         self.xs_p = [0.0] * ng
         self.xs_f = [0.0] * ng
-        self.chi  = [0.0] * ng
+        self.chi = [0.0] * ng
 
         self.xs_e = [[0.0] * self.ned for i in range(ng)]
-        self.xs_s0= [[0.0] * ng for i in range(ng)]
-        self.xs_s1= [[0.0] * ng for i in range(ng)]
-        self.xs_s2= [[0.0] * ng for i in range(ng)]
-        self.xs_s3= [[0.0] * ng for i in range(ng)]
-        self.xs_s4= [[0.0] * ng for i in range(ng)]
-        self.xs_s5= [[0.0] * ng for i in range(ng)]
+        self.xs_s0 = [[0.0] * ng for i in range(ng)]
+        self.xs_s1 = [[0.0] * ng for i in range(ng)]
+        self.xs_s2 = [[0.0] * ng for i in range(ng)]
+        self.xs_s3 = [[0.0] * ng for i in range(ng)]
+        self.xs_s4 = [[0.0] * ng for i in range(ng)]
+        self.xs_s5 = [[0.0] * ng for i in range(ng)]
 
         # >> temp data store transx xs_s, xs_e
         self.exs = [['0.000E+00'] * (ng) for i in range(self.ned)]
@@ -123,18 +133,22 @@ class Material(object):
 
         while True:
             linelist = inp.readline().split()
-            if len(linelist) < 1:continue
+            if len(linelist) < 1:
+                continue
             if linelist[0] == '**' and linelist[1] == self.name:
                 for il in range(self.nl):
                     head = 0
-                    num  = 0
+                    num = 0
                     tail = 0
                     basenum = 0
                     while True:
-                        if done:break
-                        if tail == self.ng:break
+                        if done:
+                            break
+                        if tail == self.ng:
+                            break
                         llist = inp.readline().split()
-                        if len(llist) < 1:continue
+                        if len(llist) < 1:
+                            continue
                         if llist[0] == 'position':
                             head = num * lg
                             tail = head + lg
@@ -145,20 +159,24 @@ class Material(object):
                                 if len(llist1) == 1 and llist1[0] == '1':
                                     done = True
                                     break
-                                if len(llist1) == 0:break
+                                if len(llist1) == 0:
+                                    break
                                 # extra xs
                                 if il == 0:
                                     if llist1[1] in self.exsnames:
                                         ii = self.exsnames.index(llist1[1])
                                         self.exs[ii][head:tail] = llist1[2:]
                                     if llist1[1] == 'abs':
-                                        self.xs_a[head:tail] = map(float, llist1[2:])
+                                        self.xs_a[head:tail] = map(
+                                            float, llist1[2:])
                                         continue
                                     if llist1[1] == 'nusigf':
-                                        self.xs_p[head:tail] = map(float, llist1[2:])
+                                        self.xs_p[head:tail] = map(
+                                            float, llist1[2:])
                                         continue
                                     if llist1[1] == 'total':
-                                        self.xs_t[head:tail] = map(float, llist1[2:])
+                                        self.xs_t[head:tail] = map(
+                                            float, llist1[2:])
                                         basenum = int(llist1[0])
                                         continue
                                 else:
@@ -217,7 +235,7 @@ class Material(object):
     #======================================================================
     def export_h5(self, h5file):
         # print (self.name + ' export cross-sections to the hdf5 file...')
-        pref = '/xs/' +  self.name
+        pref = '/xs/' + self.name
         h5file[pref + '/xs_t'] = self.xs_t
         if self.nl >= 1:
             h5file[pref + '/xs_s0'] = self.xs_s0

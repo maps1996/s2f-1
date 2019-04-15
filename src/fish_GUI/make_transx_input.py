@@ -46,7 +46,7 @@ def card2(n_TF, g_TF):
     return c
 
 
-def card3(datapath, n_TF, g_TF, count1, count2):
+def card3(datapath, n_TF, g_TF, count1, count2, count3, count4):
 
     # NGROUP = neutron + gamma
     any_file = os.listdir(datapath)[0]
@@ -68,7 +68,7 @@ def card3(datapath, n_TF, g_TF, count1, count2):
     NGROUP = -(n_group + g_group)
 
     # NL = ??
-    NL = 1
+    NL = count3
 
     # NUP = ??
     NUP = 0
@@ -87,10 +87,10 @@ def card3(datapath, n_TF, g_TF, count1, count2):
 
     # NED = number of extra edits, always assume 7 for heat, kerma, dame, dpa,
     # t, he, and h
-    NED = 0
+    NED = count4
 
     # NEDS = equals the number of entries for the edits
-    NEDS = 0
+    NEDS = NED
 
     # NTABL = ??
     NTABL = abs(NGROUP) + NED + NUP + 3
@@ -100,7 +100,7 @@ def card3(datapath, n_TF, g_TF, count1, count2):
                                                                NTHG, NMIX,
                                                                NREG, NMIXS,
                                                                NED, NEDS)
-    c += "*/home/maps/matxsdata/*/\n"
+    c += " */home/maps/matxsdata/*/\n"
     return c
 
 
@@ -143,8 +143,22 @@ def card6():
 def card7(names, n):
     c = ""
     for mix in names:
-        c += "     {}    {}    {}/\n".format(n + 1, n + 1, mix)
+        c += " {}    {}    {}/\n".format(n + 1, n + 1, mix)
 
+    return c
+
+
+def card8(names):
+    c = ''
+    for exs in names:
+        c += ' {}\n'.format(exs)
+    return c
+
+
+def card9(names):
+    c = ''
+    for i, exs in enumerate(names):
+        c += ' {}  {}  /\n'.format(i + 1, exs)
     return c
 
 
